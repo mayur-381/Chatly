@@ -13,7 +13,9 @@ export function useWebSocket(onMessage) {
     const apiUrl = import.meta.env.VITE_API_URL || ''
     let wsUrl
     if (apiUrl) {
-      const wsBase = apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')
+      // Remove /api suffix for WebSocket URL
+      const baseUrl = apiUrl.replace('/api', '')
+      const wsBase = baseUrl.replace('https://', 'wss://').replace('http://', 'ws://')
       wsUrl = `${wsBase}/ws?token=${token}`
     } else {
       const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
