@@ -1,87 +1,110 @@
-# Chatly — Full Stack Real-Time Chat App
+# 💬 Chatly — Real-time Team Chat App
 
-Built with **FastAPI** + **React** + **WebSockets** + **PostgreSQL** + **Redis**
+A full-stack real-time messaging platform built from scratch — similar to Slack/Discord.
 
-## Features
-- Real-time messaging via WebSockets
-- Public rooms + Private rooms + Direct Messages (DMs)
-- File & image sharing (drag and drop or attach)
-- Reply to messages
-- Delete messages
-- Online presence indicators (green dot)
-- Typing indicators
-- Push notifications (in-app)
-- Unread message counts
-- JWT authentication
-- User search & profiles
+🌐 **Live Demo:** [chatly-frontend-okc5.onrender.com](https://chatly-frontend-okc5.onrender.com)
 
-## Tech Stack
-| Layer | Tech |
-|-------|------|
-| Backend | FastAPI, Python 3.11 |
-| Real-time | WebSockets (native FastAPI) |
-| Database | PostgreSQL 16 + SQLAlchemy |
-| Cache/Presence | Redis 7 |
-| Auth | JWT (python-jose) + bcrypt |
+![Chatly](https://img.shields.io/badge/Status-Live-brightgreen) ![Python](https://img.shields.io/badge/Python-3.11-blue) ![React](https://img.shields.io/badge/React-18-61DAFB) ![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688)
+
+---
+
+## ✨ Features
+
+- 🏢 **Multiple Workspaces** — like Discord servers
+- 📢 **Public Channels** — open to all workspace members
+- 🔒 **Private Groups** — invite specific members only
+- 💬 **Direct Messages** — private 1-on-1 chats
+- ⚡ **Real-time Messaging** — via WebSockets
+- 👑 **Roles & Permissions** — Owner / Admin / Member
+- 😀 **Emoji Reactions** — react to any message
+- 🟢 **Online Presence** — see who's online
+- 📎 **File & Image Sharing** — attach files to messages
+- 📌 **Pin Messages** — admins can pin important messages
+- 🔇 **Mute Members** — admins can mute disruptive members
+- 🔔 **Browser Notifications** — get notified when away
+- 📅 **Date Labels** — Today / Yesterday / date dividers
+- 🔗 **Invite Codes** — share a code to join workspace
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
 | Frontend | React 18 + Vite |
-| Routing | React Router v6 |
-| HTTP client | Axios |
-| File uploads | FastAPI UploadFile + aiofiles |
-| Deploy | Docker + Docker Compose + Nginx |
+| Real-time | WebSocket API |
+| Backend | FastAPI + Python 3.11 |
+| Database | PostgreSQL + SQLAlchemy ORM |
+| Cache | Redis 7 |
+| Auth | JWT + bcrypt |
+| Server | Nginx + Uvicorn |
+| Deploy | Docker + Docker Compose |
+| Cloud DB | Neon PostgreSQL |
+| Hosting | Render |
 
-## Quick Start (Docker)
+---
+
+## 🏗️ Architecture
+
+```
+React (Nginx) ←→ REST + WebSocket ←→ FastAPI ←→ PostgreSQL + Redis
+```
+
+---
+
+## 🚀 Run Locally
+
+### Prerequisites
+- Docker Desktop
+- Git
+
+### Steps
 
 ```bash
-git clone <your-repo>
-cd chatly
+# Clone the repo
+git clone https://github.com/mayur-381/Chatly.git
+cd Chatly
+
+# Copy env file
+copy backend\.env.example backend\.env
+
+# Start everything
 docker compose up --build
 ```
 
-Open http://localhost:3000
+Open `http://localhost:3000` and sign up!
 
-## Local Development
+---
 
-### Backend
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your local DB/Redis URLs
-uvicorn app.main:app --reload --port 8000
-```
+## 📁 Project Structure
 
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open http://localhost:3000 — API proxied to localhost:8000 automatically.
-
-## API Docs
-Visit http://localhost:8000/docs for the interactive Swagger UI.
-
-## Project Structure
 ```
 chatly/
-├── backend/
+├── backend/          # FastAPI Python backend
 │   ├── app/
-│   │   ├── core/          # Config, DB, security, Redis, WebSocket manager
-│   │   ├── models/        # SQLAlchemy models (User, Room, Message, Notification)
-│   │   ├── routers/       # FastAPI routes (auth, rooms, messages, users, ws)
-│   │   └── schemas/       # Pydantic schemas
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/
-│   ├── src/
-│   │   ├── pages/         # ChatPage, AuthPage
-│   │   ├── hooks/         # useWebSocket
-│   │   ├── store/         # AuthContext
-│   │   └── utils/         # api.js (axios client)
-│   ├── package.json
-│   └── Dockerfile
+│   │   ├── routers/  # API endpoints
+│   │   ├── models/   # Database models
+│   │   ├── schemas/  # Pydantic schemas
+│   │   └── core/     # Config, DB, Auth, WebSocket
+│   └── requirements.txt
+├── frontend/         # React frontend
+│   └── src/
+│       ├── pages/    # ChatPage, AuthPage
+│       ├── hooks/    # useWebSocket
+│       ├── store/    # AuthContext
+│       └── utils/    # API client
 └── docker-compose.yml
 ```
+
+---
+
+## 👤 Author
+
+**Mayur Salunkhe**
+- GitHub: [@mayur-381](https://github.com/mayur-381)
+
+---
+
+## 📄 License
+
+MIT License
