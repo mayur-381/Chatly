@@ -10,9 +10,17 @@ export function useWebSocket(onMessage) {
     const token = localStorage.getItem('chatly_token')
     if (!token) return
 
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const url = `${protocol}://${window.location.host}/ws?token=${token}`
-    ws.current = new WebSocket(url)
+    const apiUrl = import.meta.env.VITE_API_URL || ''
+    let wsUrl
+    if (apiUrl) {
+      const wsBase = apiUrl.replace('https://', 'wss://').replace('http://', 'ws://')
+      wsUrl = `${wsBase}/ws?token=${token}`
+    } else {
+      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+      wsUrl = `${protocol}://${window.location.host}/ws?token=${token}`
+    }
+
+    ws.current = new WebSocket(wsUrl)
 
     ws.current.onmessage = (e) => {
       try {
