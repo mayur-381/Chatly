@@ -77,6 +77,14 @@ export default function ChatPage() {
   const [memberSearch, setMemberSearch] = useState('')
   const [uploading, setUploading] = useState(false)
   const [activeEmojiPicker, setActiveEmojiPicker] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   const fileRef = useRef(null)
   const bottomRef = useRef(null)
   const typingTimer = useRef(null)
@@ -91,7 +99,7 @@ export default function ChatPage() {
       case 'new_message':
         if (Notification.permission === 'granted' && document.hidden) {
           const senderName = p.sender?.display_name || p.sender?.username || 'Someone'
-          const n = new Notification('Chatly', { body: `${senderName}: ${p.content || '📎 File'}`, icon: '/favicon.ico', tag: p.room_id })
+          const n = new Notification('Syncly', { body: `${senderName}: ${p.content || '📎 File'}`, icon: '/favicon.ico', tag: p.room_id })
           n.onclick = () => { window.focus(); n.close() }
         }
         setMessages(prev => prev.some(x => x.id === p.id) ? prev : [...prev, p])
@@ -297,10 +305,10 @@ export default function ChatPage() {
   const getSenderBadge = (senderId) => { const m = wsMembers.find(m => m.user_id === senderId); return m ? ROLE_BADGE[m.role] : null }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: C.bg, color: C.secondary, fontFamily: 'Inter, sans-serif', overflow: 'hidden', fontSize: 14 }}>
+    <div style={{ display: 'flex', height: '100vh', background: C.bg, color: C.secondary, fontFamily: 'Inter, sans-serif', overflow: 'hidden', fontSize: 14, flexDirection: isMobile ? 'column' : 'row' }}>
 
       {/* WORKSPACE RAIL */}
-      <div style={{ width: 64, borderRight: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', gap: 8, flexShrink: 0, overflowY: 'auto' }}>
+      {!isMobile && <div style={{ width: 64, borderRight: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', gap: 8, flexShrink: 0, overflowY: 'auto' }}>
         {workspaces.map(ws => (
           <button key={ws.id} onClick={() => setActiveWs(ws)} title={ws.name}
             style={{ width: 44, height: 44, borderRadius: activeWs?.id === ws.id ? 14 : '50%', background: activeWs?.id === ws.id ? C.accent : C.bg3, border: `2px solid ${activeWs?.id === ws.id ? '#A78BFA' : 'transparent'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0 }}>
@@ -315,10 +323,12 @@ export default function ChatPage() {
         <div style={{ flex: 1 }} />
         <button onClick={logout} title="Sign out"
           style={{ width: 44, height: 44, borderRadius: '50%', background: C.bg3, border: 'none', color: C.muted, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🚪</button>
-      </div>
+      </div>}
 
       {/* SIDEBAR */}
-      <div style={{ width: 248, borderRight: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0, background: C.bg2 }}>
+      {(!isMobile || sidebarOpen) && (
+      <div onClick={isMobile ? () => setSidebarOpen(false) : undefined} style={{ position: isMobile ? 'fixed' : 'relative', inset: isMobile ? 0 : 'auto', background: isMobile ? 'rgba(0,0,0,0.5)' : 'transparent', zIndex: isMobile ? 100 : 'auto', display: 'flex' }}>
+      <div style={{ width: 248, borderRight: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0, background: C.bg2, height: isMobile ? '100vh' : 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, minHeight: 62 }}>
           {activeWs ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -337,7 +347,7 @@ export default function ChatPage() {
               </div>
             </div>
           ) : (
-            <div style={{ fontFamily: 'Fira Code, monospace', color: C.accent, fontWeight: 700, fontSize: 16 }}>Chatly</div>
+            <div style={{ fontFamily: 'Fira Code, monospace', color: C.accent, fontWeight: 700, fontSize: 16 }}>Syncly</div>
           )}
         </div>
 
@@ -439,6 +449,22 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+      </div>)}
+
+      {/* MOBILE HEADER */}
+      {isMobile && activeRoom && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 52, background: C.bg2, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12, zIndex: 99 }}>
+          <button onClick={() => { setActiveRoom(null); setSidebarOpen(false) }} style={{ background: 'none', border: 'none', color: C.text, fontSize: 20, cursor: 'pointer', padding: 4 }}>←</button>
+          <span style={{ fontWeight: 600, color: C.text, fontSize: 15, flex: 1 }}>{activeRoom.name}</span>
+          <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', color: C.muted, fontSize: 20, cursor: 'pointer', padding: 4 }}>☰</button>
+        </div>
+      )}
+      {isMobile && !activeRoom && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 52, background: C.bg2, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12, zIndex: 99 }}>
+          <span style={{ fontWeight: 700, color: C.accent, fontFamily: 'Fira Code, monospace', fontSize: 16, flex: 1 }}>Chatly</span>
+          <button onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', color: C.muted, fontSize: 22, cursor: 'pointer', padding: 4 }}>☰</button>
+        </div>
+      )}
 
       {/* MAIN CHAT */}
       {activeRoom ? (
@@ -606,7 +632,7 @@ export default function ChatPage() {
           ) : (
             <>
               <div style={{ fontSize: 48 }}>💬</div>
-              <div style={{ fontSize: 20, fontWeight: 600, color: C.text }}>Welcome to Chatly</div>
+              <div style={{ fontSize: 20, fontWeight: 600, color: C.text }}>Welcome to Syncly</div>
               <div style={{ fontSize: 14, color: C.muted, marginBottom: 12 }}>Create a workspace or join one</div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button onClick={() => { setModal('createWs'); setForm({}) }} style={btn(true)}>Create workspace</button>
